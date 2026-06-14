@@ -1,0 +1,14 @@
+{
+  "name": "discord-community-map",
+  "version": "1.0.0",
+  "description": "Discord interactive member map bot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  }
+}

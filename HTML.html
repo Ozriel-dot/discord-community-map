@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discord Community World Map</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body,
+      html {
+        height: 100%;
+        width: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+      }
+      #map {
+        height: 100vh;
+        width: 100vw;
+        background-color: #2f3136;
+      }
+      .discord-avatar-marker {
+        border: 3px solid #5865f2;
+        border-radius: 50%;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+        transition: transform 0.2s;
+      }
+      .discord-avatar-marker:hover {
+        transform: scale(1.2);
+        border-color: #57f287;
+        z-index: 99999 !important;
+      }
+      .custom-tooltip {
+        background-color: #23272a;
+        color: white;
+        border: 1px solid #23272a;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const map = L.map("map").setView([20, 0], 2);
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        {
+          attribution: "© OpenStreetMap contributors © CARTO",
+          maxZoom: 18,
+        }
+      ).addTo(map);
+
+      fetch("/api/locations")
+        .then((res) => res.json())
+        .then((users) => {
+          Object.values(users).forEach((user) => {
+            const avatarIcon = L.icon({
+              iconUrl: user.avatar,
+              iconSize: [42, 42],
+              iconAnchor: [21, 21],
+              className: "discord-avatar-marker",
+            });
+
+            const marker = L.marker([user.lat, user.lon], {
+              icon: avatarIcon,
+            }).addTo(map);
+            marker.bindTooltip(
+              `
+                        <strong>${user.displayName}</strong><br/>
+                        <span style="font-size:11px; color:#b9bbbe;">📍 ${user.placeName}</span>
+                    `,
+              {
+                direction: "top",
+                offset: [0, -20],
+                className: "custom-tooltip",
+              }
+            );
+          });
+        })
+        .catch((err) => console.error("Error loading map data: ", err));
+    </script>
+  </body>
+</html>
